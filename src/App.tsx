@@ -35,9 +35,20 @@ function App() {
   }
 
   const toggleTodo = (id: number) => {
-    setTodos(todos.map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ))
+    setTodos(prevTodos => {
+      const todoIndex = prevTodos.findIndex(todo => todo.id === id)
+      const todo = prevTodos[todoIndex]
+      const newCompleted = !todo.completed
+      
+      // 현재 할일을 제외한 나머지 목록
+      const remainingTodos = prevTodos.filter((_, index) => index !== todoIndex)
+      
+      // 체크되면 마지막으로, 체크 해제되면 맨 앞으로
+      const updatedTodo = { ...todo, completed: newCompleted }
+      return newCompleted 
+        ? [...remainingTodos, updatedTodo]  // 체크된 경우 마지막으로
+        : [updatedTodo, ...remainingTodos]  // 체크 해제된 경우 맨 앞으로
+    })
   }
 
   const deleteTodo = (id: number) => {
