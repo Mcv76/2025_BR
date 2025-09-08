@@ -17,17 +17,18 @@ const AddTodo = ({ onAdd }: AddTodoProps) => {
   }, [text, onAdd])
 
   return (
-    <form onSubmit={handleSubmit} className="d-flex gap-2">
+    <form onSubmit={handleSubmit} className="d-flex align-items-center gap-2">
       <input
         type="text"
-        className="form-control"
+        className="form-control flex-grow-1"
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="새로운 할일을 입력하세요"
       />
       <button
         type="submit"
-        className="btn btn-primary"
+        className="btn btn-primary px-4"
+        style={{ minWidth: '80px' }}
         disabled={!text.trim()}
       >
         추가
