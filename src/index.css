@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 커스텀 스타일 */
+.todo-item:hover {
+  @apply bg-gray-50;
+}
+
+.todo-item.completed {
+  @apply opacity-50;
+}
