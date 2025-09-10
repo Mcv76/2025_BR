@@ -25,6 +25,7 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
       </div>
       <button
         className="btn btn-danger btn-sm"
+        style={{ minWidth: '60px' }}
         onClick={() => onDelete(todo.id)}
       >
         삭제

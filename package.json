@@ -1,5 +1,6 @@
 {
   "name": "todo-app",
+  "type": "module",
   "homepage": "https://mcv76.github.io/2025_BR/",
   "version": "1.0.0",
   "description": "할일 관리 웹 애플리케이션",

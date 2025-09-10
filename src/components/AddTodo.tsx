@@ -28,7 +28,7 @@ const AddTodo = ({ onAdd }: AddTodoProps) => {
       <button
         type="submit"
         className="btn btn-primary px-4"
-        style={{ minWidth: '80px' }}
+        style={{ minWidth: '90px' }}
         disabled={!text.trim()}
       >
         추가

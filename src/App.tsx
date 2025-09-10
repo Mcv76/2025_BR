@@ -29,9 +29,15 @@ function App() {
     const newTodo: Todo = {
       id: Date.now(),
       text,
-      completed: false
+      completed: false,
+      createdAt: Date.now(),
+      groupId: 'active'
     }
-    setTodos([...todos, newTodo])
+    setTodos(prevTodos => {
+      const activeTodos = prevTodos.filter(todo => todo.groupId === 'active')
+      const completedTodos = prevTodos.filter(todo => todo.groupId === 'completed')
+      return [newTodo, ...activeTodos, ...completedTodos]
+    })
   }
 
   const toggleTodo = (id: number) => {
@@ -40,14 +46,24 @@ function App() {
       const todo = prevTodos[todoIndex]
       const newCompleted = !todo.completed
       
-      // 현재 할일을 제외한 나머지 목록
-      const remainingTodos = prevTodos.filter((_, index) => index !== todoIndex)
-      
-      // 체크되면 마지막으로, 체크 해제되면 맨 앞으로
-      const updatedTodo = { ...todo, completed: newCompleted }
-      return newCompleted 
-        ? [...remainingTodos, updatedTodo]  // 체크된 경우 마지막으로
-        : [updatedTodo, ...remainingTodos]  // 체크 해제된 경우 맨 앞으로
+      const updatedTodo: Todo = {
+        ...todo,
+        completed: newCompleted,
+        completedAt: newCompleted ? Date.now() : undefined,
+        groupId: newCompleted ? 'completed' : 'active',
+        order: undefined // 상태 변경 시 순서 초기화
+      }
+
+      const activeTodos = prevTodos.filter(t => t.groupId === 'active' && t.id !== id)
+      const completedTodos = prevTodos.filter(t => t.groupId === 'completed' && t.id !== id)
+
+      if (newCompleted) {
+        // 완료 그룹으로 이동 (최하단)
+        return [...activeTodos, ...completedTodos, updatedTodo]
+      } else {
+        // 미완료 그룹으로 이동 (최상단)
+        return [updatedTodo, ...activeTodos, ...completedTodos]
+      }
     })
   }
 
@@ -60,10 +76,25 @@ function App() {
     if (result.destination.index === result.source.index) return
 
     setTodos(prevTodos => {
+      const sourceIndex = result.source.index
+      const destIndex = result.destination!.index
+      const sourceItem = prevTodos[sourceIndex]
+      const destItem = prevTodos[destIndex]
+
+      // 같은 그룹 내에서만 드래그 앤 드롭 허용
+      if (sourceItem.groupId !== destItem.groupId) {
+        return prevTodos
+      }
+
       const items = Array.from(prevTodos)
-      const [reorderedItem] = items.splice(result.source.index, 1)
-      items.splice(result.destination!.index, 0, reorderedItem)
-      return items
+      const [reorderedItem] = items.splice(sourceIndex, 1)
+      items.splice(destIndex, 0, reorderedItem)
+
+      // 드래그 앤 드롭 순서 저장
+      return items.map((item, index) => ({
+        ...item,
+        order: item.groupId === sourceItem.groupId ? index : item.order
+      }))
     })
   }, [])
 

@@ -1,7 +1,7 @@
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { Todo } from '../types'
 import TodoItem from './TodoItem'
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 
 interface TodoListProps {
   todos: Todo[]
@@ -9,7 +9,26 @@ interface TodoListProps {
   onDelete: (id: number) => void
 }
 
-const TodoList = ({ todos, onToggle, onDelete }: TodoListProps) => {
+function TodoList({ todos = [], onToggle, onDelete }: TodoListProps) {
+  const renderDraggable = useCallback((todo: Todo, index: number) => (
+    <Draggable key={todo.id} draggableId={todo.id.toString()} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={`mb-2 ${snapshot.isDragging ? 'opacity-50' : ''}`}
+        >
+          <TodoItem
+            todo={todo}
+            onToggle={onToggle}
+            onDelete={onDelete}
+          />
+        </div>
+      )}
+    </Draggable>
+  ), [onToggle, onDelete])
+
   if (todos.length === 0) {
     return (
       <div className="text-center text-gray-500 my-4">
@@ -26,28 +45,7 @@ const TodoList = ({ todos, onToggle, onDelete }: TodoListProps) => {
           {...provided.droppableProps}
           className="mt-4"
         >
-          {todos.map((todo, index) => (
-            <Draggable
-              key={todo.id}
-              draggableId={todo.id.toString()}
-              index={index}
-            >
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                  className={`mb-2 ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                >
-                  <TodoItem
-                    todo={todo}
-                    onToggle={onToggle}
-                    onDelete={onDelete}
-                  />
-                </div>
-              )}
-            </Draggable>
-          ))}
+          {todos.map(renderDraggable)}
           {provided.placeholder}
         </div>
       )}
